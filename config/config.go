@@ -4,14 +4,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"go.uber.org/zap"
-	"io/ioutil"
 	"os"
 )
 
 func Load(logger *zap.SugaredLogger) Settings {
 	var settings Settings
 	filePath := fmt.Sprintf("./.config/%s.json", "local")
-	fileBytes, err := ioutil.ReadFile(filePath)
+	fileBytes, err := os.ReadFile(filePath)
 
 	if err != nil {
 		logger.Error(err.Error())

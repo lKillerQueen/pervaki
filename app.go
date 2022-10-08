@@ -18,8 +18,11 @@ type App struct {
 
 func NewApp(ctxProvider pctx.DefaultProvider, logger *zap.SugaredLogger, settings config.Settings) App {
 	var (
-		animalService = service.NewAnimalService()
-		server        = api.NewServer(ctxProvider, logger, settings, animalService)
+		cli = http.Client{}
+
+		animalService    = service.NewAnimalService()
+		anilibriaService = service.NewAnilibriaService(logger, &cli)
+		server           = api.NewServer(ctxProvider, logger, settings, animalService, anilibriaService)
 	)
 
 	return App{

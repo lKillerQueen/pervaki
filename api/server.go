@@ -18,11 +18,13 @@ func NewServer(
 	logger *zap.SugaredLogger,
 	settings config.Settings,
 	animalService service.AnimalService,
+	anilibriaService service.AnilibriaService,
 ) *http.Server {
 	router := mux.NewRouter()
 
 	router.HandleFunc("/ping", handler.Ping(logger)).Methods(http.MethodPost)
 	router.HandleFunc("/animal/sound", handler.AnimalSound(logger, animalService)).Methods(http.MethodPost)
+	router.HandleFunc("/anilibria/title/{titleCode}/name", handler.AnilibriaTitle(logger, anilibriaService)).Methods(http.MethodGet)
 
 	return &http.Server{
 		Addr: fmt.Sprintf(":%d", settings.Port),
