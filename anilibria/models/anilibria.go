@@ -1,4 +1,4 @@
-package model
+package models
 
 type GetTitleFilter struct {
 	Code string

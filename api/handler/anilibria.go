@@ -5,15 +5,12 @@ import (
 	"go.uber.org/zap"
 	"io"
 	"net/http"
-	"pervaki/model"
 	"pervaki/service"
 )
 
 func AnilibriaTitle(logger *zap.SugaredLogger, service service.AnilibriaService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		titleCode := mux.Vars(r)["titleCode"]
-
-		title, err := service.GetTitle(r.Context(), model.GetTitleFilter{Code: titleCode})
+		title, err := service.GetTitleName(r.Context(), mux.Vars(r)["titleCode"])
 		if err != nil {
 			logger.Error(err)
 			w.WriteHeader(http.StatusBadRequest)

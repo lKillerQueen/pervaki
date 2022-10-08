@@ -2,12 +2,15 @@ package main
 
 import (
 	"context"
-	"go.uber.org/zap"
 	"net/http"
+	"pervaki/anilibria"
+
 	"pervaki/api"
 	"pervaki/config"
 	"pervaki/lib/pctx"
 	"pervaki/service"
+
+	"go.uber.org/zap"
 )
 
 type App struct {
@@ -18,11 +21,14 @@ type App struct {
 
 func NewApp(ctxProvider pctx.DefaultProvider, logger *zap.SugaredLogger, settings config.Settings) App {
 	var (
-		cli = http.Client{}
+		cli = &http.Client{}
+
+		anilibriaClient = anilibria.NewClient(logger, cli)
 
 		animalService    = service.NewAnimalService()
-		anilibriaService = service.NewAnilibriaService(logger, &cli)
-		server           = api.NewServer(ctxProvider, logger, settings, animalService, anilibriaService)
+		anilibriaService = service.NewAnilibriaService(logger, anilibriaClient)
+
+		server = api.NewServer(ctxProvider, logger, settings, animalService, anilibriaService)
 	)
 
 	return App{
