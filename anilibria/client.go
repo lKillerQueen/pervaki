@@ -8,8 +8,9 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"pervaki/anilibria/models"
+	"pervaki/anilibria/model"
 	"pervaki/lib/rateclient"
+	serviceModel "pervaki/model"
 	"time"
 
 	"go.uber.org/zap"
@@ -37,19 +38,19 @@ func NewClient(logger *zap.SugaredLogger, cli *http.Client) Client {
 	}
 }
 
-func (c Client) GetTitle(ctx context.Context, filter models.GetTitleFilter) (models.Title, error) {
+func (c Client) GetTitle(ctx context.Context, filter model.GetTitleFilter) (serviceModel.Title, error) {
 	var urlValues = make(url.Values)
 	if len(filter.Code) != 0 {
 		urlValues.Set("code", filter.Code)
 	}
 
-	var data models.Title
+	var data model.Title
 	err := c.do(ctx, http.MethodGet, fmt.Sprintf(urlGetTitleFormat, host, urlValues.Encode()), nil, &data)
 	if err != nil {
-		return models.Title{}, err
+		return serviceModel.Title{}, err
 	}
 
-	return data, nil
+	return MapClientToService(data), nil
 }
 
 func (c Client) do(ctx context.Context, method string, url string, body io.Reader, output interface{}) error {

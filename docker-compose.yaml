@@ -1,0 +1,14 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: pervaki
+      POSTGRES_DB: pervaki_db
+      POSTGRES_PASSWORD: JjppOAu0f91p3j009fpaijf203hOHhhfo
+    volumes:
+      - ~/volumes/pervaki_db:/var/lib/postgresql/data

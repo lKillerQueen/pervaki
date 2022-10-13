@@ -4,6 +4,8 @@ import (
 	"context"
 	"net/http"
 	"pervaki/anilibria"
+	"pervaki/database"
+	"pervaki/database/titlerepo"
 
 	"pervaki/api"
 	"pervaki/config"
@@ -20,13 +22,20 @@ type App struct {
 }
 
 func NewApp(ctxProvider pctx.DefaultProvider, logger *zap.SugaredLogger, settings config.Settings) App {
+	pgDb, err := database.NewPgx(settings.Postgres)
+	if err != nil {
+		panic(err)
+	}
+
 	var (
 		cli = &http.Client{}
 
 		anilibriaClient = anilibria.NewClient(logger, cli)
 
+		anilibriaRepo = titlerepo.NewRepository(logger, pgDb)
+
 		animalService    = service.NewAnimalService()
-		anilibriaService = service.NewAnilibriaService(logger, anilibriaClient)
+		anilibriaService = service.NewAnilibriaService(logger, anilibriaClient, anilibriaRepo)
 
 		server = api.NewServer(ctxProvider, logger, settings, animalService, anilibriaService)
 	)
