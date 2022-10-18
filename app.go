@@ -27,6 +27,11 @@ func NewApp(ctxProvider pctx.DefaultProvider, logger *zap.SugaredLogger, setting
 		panic(err)
 	}
 
+	err = database.UpMigrations(pgDb)
+	if err != nil {
+		panic(err)
+	}
+
 	var (
 		cli = &http.Client{}
 
