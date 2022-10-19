@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"golang.org/x/time/rate"
 	"io"
 	"net/http"
 	"net/url"
@@ -12,6 +11,8 @@ import (
 	"pervaki/lib/rateclient"
 	serviceModel "pervaki/model"
 	"time"
+
+	"golang.org/x/time/rate"
 
 	"go.uber.org/zap"
 )
@@ -22,7 +23,7 @@ const (
 )
 
 const (
-	host              = `https://api.anilibria.tv/v2`
+	host              = `http://api.anilibria.tv/v2`
 	urlGetTitleFormat = `%s/getTitle?%s`
 )
 
