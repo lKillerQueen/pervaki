@@ -11,7 +11,7 @@ import (
 
 type AnilibriaRepo interface {
 	Upsert(ctx context.Context, title serviceModel.Title) error
-	Select() (string, error)
+	Select() ([]model.Title, error)
 	UpsertThroughBuilder(ctx context.Context, title serviceModel.Title) error
 }
 
@@ -41,12 +41,12 @@ func (s AnilibriaService) GetTitleName(ctx context.Context, code string) (string
 
 	return title.NameRu, nil
 }
-func (s AnilibriaService) GetAll(ctx context.Context) (string, error) {
+func (s AnilibriaService) GetAll(ctx context.Context) ([]model.Title, error) {
 
-	title, err := s.anilibriaRepo.Select()
+	titles, err := s.anilibriaRepo.Select()
 	if err != nil {
-		return "", err
+		return titles, err
 	}
 
-	return title, nil
+	return titles, nil
 }

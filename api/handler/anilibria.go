@@ -7,6 +7,8 @@ import (
 
 	"github.com/gorilla/mux"
 	"go.uber.org/zap"
+
+	"encoding/json"
 )
 
 func AnilibriaTitle(logger *zap.SugaredLogger, service service.AnilibriaService) http.HandlerFunc {
@@ -33,7 +35,9 @@ func AnilibriaAll(logger *zap.SugaredLogger, service service.AnilibriaService) h
 			return
 		}
 
-		if _, err := io.WriteString(w, rows); err != nil {
+		JsonBytes, err := json.Marshal(rows)
+
+		if _, err := io.WriteString(w, string(JsonBytes)); err != nil {
 			logger.Errorf("error to write response: %s", err)
 		}
 	}

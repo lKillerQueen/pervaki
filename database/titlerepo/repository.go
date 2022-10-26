@@ -9,8 +9,6 @@ import (
 	"github.com/Masterminds/squirrel"
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
-
-	"encoding/json"
 )
 
 type Repository struct {
@@ -68,17 +66,14 @@ func (r Repository) UpsertThroughBuilder(ctx context.Context, title model.Title)
 	return nil
 }
 
-func (r Repository) Select() (string, error) {
+func (r Repository) Select() ([]model.Title, error) {
 
-	rows := []Title{}
+	rows := []model.Title{}
 
 	err := r.db.Select(rows, "select * from title")
 	if err != nil {
-		return "Error", err
+		return []model.Title{}, err
 	}
-
-	JsonString, err := json.Marshal(rows)
-
-	return string(JsonString), nil
+	return rows, nil
 
 }
