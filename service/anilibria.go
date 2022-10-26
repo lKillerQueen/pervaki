@@ -11,10 +11,8 @@ import (
 
 type AnilibriaRepo interface {
 	Upsert(ctx context.Context, title serviceModel.Title) error
-	ShowAll(ctx context.Context) (string, error)
+	Select() (string, error)
 	UpsertThroughBuilder(ctx context.Context, title serviceModel.Title) error
-	// UpsertThroughBuilder(ctx context.Context, title serviceModel.Title) error
-	// UpsertThroughBuilder(ctx context.Context, title serviceModel.Title) error
 }
 
 type AnilibriaService struct {
@@ -36,7 +34,6 @@ func (s AnilibriaService) GetTitleName(ctx context.Context, code string) (string
 	if err != nil {
 		return "", err
 	}
-
 	err = s.anilibriaRepo.UpsertThroughBuilder(ctx, title)
 	if err != nil {
 		return "", err
@@ -44,20 +41,12 @@ func (s AnilibriaService) GetTitleName(ctx context.Context, code string) (string
 
 	return title.NameRu, nil
 }
-func (s AnilibriaService) TitleCacheRemove(ctx context.Context, code string) (string, error) {
-	return "", nil
-}
-func (s AnilibriaService) TitleCacheGet(ctx context.Context, code string) (string, error) {
-	return "", nil
-}
+func (s AnilibriaService) GetAll(ctx context.Context) (string, error) {
 
-func (s AnilibriaService) CacheShow(ctx context.Context) (string, error) {
-	data, err := s.anilibriaRepo.ShowAll(ctx)
+	title, err := s.anilibriaRepo.Select()
 	if err != nil {
 		return "", err
 	}
-	return data, nil
-}
-func (s AnilibriaService) CacheDrop(ctx context.Context, code string) (string, error) {
-	return "", nil
+
+	return title, nil
 }

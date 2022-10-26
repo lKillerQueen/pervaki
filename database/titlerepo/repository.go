@@ -9,6 +9,8 @@ import (
 	"github.com/Masterminds/squirrel"
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
+
+	"encoding/json"
 )
 
 type Repository struct {
@@ -48,33 +50,6 @@ func (r Repository) UpsertThroughBuilder(ctx context.Context, title model.Title)
 	if len(data.Code) == 0 {
 		return errors.New("data empty")
 	}
-	builder := psql.Insert("title").
-		Columns("code", "name_ru").
-		Values(title.Code, title.NameRu)
-	builder = builder.Suffix("on conflict (code) do update set name_ru = excluded.name_ru")
-	sqlQuery, args, err := builder.ToSql()
-	if err != nil {
-		return err
-	}
-
-	_, err = r.db.ExecContext(ctx, sqlQuery, args...)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (r Repository) InCache(ctx context.Context, title model.Title) error {
-	var (
-		psql = squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
-
-		data = MapServiceToDb(title)
-	)
-
-	if len(data.Code) == 0 {
-		return errors.New("data empty")
-	}
 
 	builder := psql.Insert("title").
 		Columns("code", "name_ru").
@@ -93,73 +68,24 @@ func (r Repository) InCache(ctx context.Context, title model.Title) error {
 	return nil
 }
 
-func (r Repository) RemoveRow(ctx context.Context, title model.Title) error {
-	var (
-		psql = squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
+func (r Repository) Select() (string, error) {
 
-		data = MapServiceToDb(title)
-	)
-
-	if len(data.Code) == 0 {
-		return errors.New("data empty")
-	}
-
-	builder := psql.Insert("title").
-		Columns("code", "name_ru").
-		Values(title.Code, title.NameRu)
-	builder = builder.Suffix("on conflict (code) do update set name_ru = excluded.name_ru")
-	sqlQuery, args, err := builder.ToSql()
+	data, err := r.db.Query("select * from title")
 	if err != nil {
-		return err
+		return "Error", err
 	}
 
-	_, err = r.db.ExecContext(ctx, sqlQuery, args...)
-	if err != nil {
-		return err
+	rows := []Title{}
+
+	for data.Next() {
+		var r Title
+		err = data.Scan(&r.Code, &r.NameRu)
+
+		rows = append(rows, r)
 	}
 
-	return nil
-}
+	JsonString, err := json.Marshal(rows)
 
-func (r Repository) ShowAll(ctx context.Context) (string, error) {
+	return string(JsonString), nil
 
-	rows := []model.Title{}
-	strRow := ""
-	err := r.db.Select(&rows, "SELECT name_ru, code FROM title")
-	if err != nil {
-		return "", err
-	}
-
-	for i := 0; i < len(rows); i++ {
-		strRow += "/n" + rows[i].Code + " " + rows[i].NameRu
-	}
-	return strRow, nil
-}
-
-func (r Repository) ClearCache(ctx context.Context, title model.Title) error {
-	var (
-		psql = squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
-
-		data = MapServiceToDb(title)
-	)
-
-	if len(data.Code) == 0 {
-		return errors.New("data empty")
-	}
-
-	builder := psql.Insert("title").
-		Columns("code", "name_ru").
-		Values(title.Code, title.NameRu)
-	builder = builder.Suffix("on conflict (code) do update set name_ru = excluded.name_ru")
-	sqlQuery, args, err := builder.ToSql()
-	if err != nil {
-		return err
-	}
-
-	_, err = r.db.ExecContext(ctx, sqlQuery, args...)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
