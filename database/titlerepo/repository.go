@@ -70,18 +70,11 @@ func (r Repository) UpsertThroughBuilder(ctx context.Context, title model.Title)
 
 func (r Repository) Select() (string, error) {
 
-	data, err := r.db.Query("select * from title")
-	if err != nil {
-		return "Error", err
-	}
-
 	rows := []Title{}
 
-	for data.Next() {
-		var r Title
-		err = data.Scan(&r.Code, &r.NameRu)
-
-		rows = append(rows, r)
+	err := r.db.Select(rows, "select * from title")
+	if err != nil {
+		return "Error", err
 	}
 
 	JsonString, err := json.Marshal(rows)
