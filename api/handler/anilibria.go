@@ -35,9 +35,14 @@ func AnilibriaAll(logger *zap.SugaredLogger, service service.AnilibriaService) h
 			return
 		}
 
-		JsonBytes, err := json.Marshal(rows)
+		jsonBytes, err := json.Marshal(rows)
+		if err != nil {
+			logger.Error(err)
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
 
-		if _, err := io.WriteString(w, string(JsonBytes)); err != nil {
+		if _, err := io.WriteString(w, string(jsonBytes)); err != nil {
 			logger.Errorf("error to write response: %s", err)
 		}
 	}
